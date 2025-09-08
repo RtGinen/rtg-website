@@ -1,24 +1,39 @@
 name: Build static site
+
 on:
   push:
     branches: [ main ]
+
 permissions:
   contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
+
       - name: Install deps
         run: npm ci
-      - name: Build static export
-        run: npm run build && npm run export
+
+      - name: Build (static export via output: 'export')
+        run: npm run build
+
+      # (Optional) debug info
+      - name: Show build outputs
+        run: |
+          echo "Root contents:"
+          ls -la
+          echo "Out contents (if present):"
+          ls -la out || true
+
       - name: Publish dist branch
         uses: JamesIves/github-pages-deploy-action@v4
         with:
